@@ -1,0 +1,10 @@
+fastapi
+joblib
+re
+string
+nltk
+pandas
+scikit-learn
+base64
+os
+
