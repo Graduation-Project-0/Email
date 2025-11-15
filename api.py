@@ -54,7 +54,7 @@ def extract_images(raw_email, save_dir ="attachments/extracted_images"):
         split_index = split_image.start()
         header = part[:split_index].strip()
         encoded_image = part[split_image.end():].strip()
-        img_name = re.search(r"filename='([^']+)'", header, re.IGNORECASE)
+        img_name = re.search(r'filename=["\']([^"\']+)["\']', header, re.IGNORECASE)
         if img_name:
             image_name = img_name.group(1)
         else:
@@ -66,6 +66,7 @@ def extract_images(raw_email, save_dir ="attachments/extracted_images"):
             f.write(image_bytes)
         extracted_img.append({
             "filename": image_name,
+            "encoded_image": encoded_image,
             "path": str(file_path)
             })
     return extracted_img  
@@ -97,6 +98,7 @@ def extract_files(raw_email, save_dir ="attachments/extracted_files"):
             f.write(file_bytes)
         extracted_files.append({
             "filename": fileName,
+            "encoded_file": encoded_file,
             "path": str(file_path)
             })
     return extracted_files
@@ -139,9 +141,9 @@ async def predict_email(file: UploadFile = File(...)):
         "num_urls": len(urls),
         "urls": urls,
         "num_images": len(images),
-        "images": [img["filename"] for img in images],
+        "images": [{"filename":img["filename"], "encoded_image":img["encoded_image"]} for img in images],
         "num_files": len(files),
-        "files": [f["filename"] for f in files],
+        "files": [{"filename":file["filename"], "encoded_file":file["encoded_file"]} for file in files],
         "text_preview": cleaned[:300]
     }
 
